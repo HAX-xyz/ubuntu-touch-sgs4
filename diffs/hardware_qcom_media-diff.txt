@@ -1,0 +1,99 @@
+diff --git a/libc2dcolorconvert/Android.mk b/libc2dcolorconvert/Android.mk
+index 1f4ed3d..0f008e8 100644
+--- a/libc2dcolorconvert/Android.mk
++++ b/libc2dcolorconvert/Android.mk
+@@ -2,6 +2,8 @@ LOCAL_PATH := $(call my-dir)
+ 
+ include $(CLEAR_VARS)
+ 
++crutch-inc := $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include
++
+ LOCAL_SRC_FILES := \
+         C2DColorConverter.cpp
+ 
+@@ -10,6 +12,7 @@ LOCAL_C_INCLUDES := \
+     $(TOP)/frameworks/native/include/media/openmax \
+     $(TOP)/hardware/qcom/display/$(TARGET_BOARD_PLATFORM)/libcopybit
+ 
++LOCAL_C_INCLUDES += $(crutch-inc)
+ LOCAL_SHARED_LIBRARIES := liblog libdl
+ 
+ LOCAL_MODULE_TAGS := optional
+diff --git a/mm-video-legacy/vidc/vdec/Android.mk b/mm-video-legacy/vidc/vdec/Android.mk
+index 1ac7287..16a8d10 100755
+--- a/mm-video-legacy/vidc/vdec/Android.mk
++++ b/mm-video-legacy/vidc/vdec/Android.mk
+@@ -84,11 +84,13 @@ libmm-vdec-inc          += hardware/qcom/display/msm8960/libqservice
+ libmm-vdec-inc          += hardware/qcom/display/msm8960/libqdutils
+ endif
+ 
++include	$(ROOT_DIR)/../../../../crutch-includes.mk
+ 
+ LOCAL_MODULE                    := libOmxVdec
+ LOCAL_MODULE_TAGS               := optional
+ LOCAL_CFLAGS                    := $(libOmxVdec-def)
+ LOCAL_C_INCLUDES                += $(libmm-vdec-inc)
++LOCAL_C_INCLUDES                += $(crutch-inc)
+ 
+ LOCAL_PRELINK_MODULE    := false
+ LOCAL_SHARED_LIBRARIES  := liblog libutils libbinder libcutils libdl
+diff --git a/mm-video-legacy/vidc/venc/Android.mk b/mm-video-legacy/vidc/venc/Android.mk
+index 9f707ca..3fd8153 100755
+--- a/mm-video-legacy/vidc/venc/Android.mk
++++ b/mm-video-legacy/vidc/venc/Android.mk
+@@ -65,12 +65,14 @@ libmm-venc-inc      += hardware/qcom/display/msm8960/libcopybit
+ endif
+ libmm-venc-inc      += frameworks/av/include/media/stagefright
+ 
+-
++include	$(ROOT_DIR)/../../../../crutch-includes.mk
+ 
+ LOCAL_MODULE                    := libOmxVenc
+ LOCAL_MODULE_TAGS               := optional
+ LOCAL_CFLAGS                    := $(libmm-venc-def)
+ LOCAL_C_INCLUDES                := $(libmm-venc-inc)
++LOCAL_C_INCLUDES                += $(crutch-inc)
++OCAL_C_INCLUDES                += $(crutch-kheaders)
+ 
+ LOCAL_PRELINK_MODULE      := false
+ LOCAL_SHARED_LIBRARIES    := liblog libutils libbinder libcutils \
+diff --git a/mm-video-legacy/vidc/venc/src/video_encoder_device.cpp b/mm-video-legacy/vidc/venc/src/video_encoder_device.cpp
+index 9d8bf74..eb1b6fb 100644
+--- a/mm-video-legacy/vidc/venc/src/video_encoder_device.cpp
++++ b/mm-video-legacy/vidc/venc/src/video_encoder_device.cpp
+@@ -1427,7 +1427,7 @@ void venc_dev::venc_config_print()
+                    multislice.mslice_size);
+ 
+   DEBUG_PRINT_HIGH("\nENC_CONFIG: EntropyMode: %d, CabacModel: %d",
+-                   entropy.longentropysel, entropy.cabacmodel);
++                   entropy.entropysel, entropy.cabacmodel);
+ 
+   DEBUG_PRINT_HIGH("\nENC_CONFIG: DB-Mode: %d, alpha: %d, Beta: %d\n",
+                    dbkfilter.db_mode, dbkfilter.slicealpha_offset,
+@@ -2172,7 +2172,7 @@ bool venc_dev::venc_set_entropy_config(OMX_BOOL enable, OMX_U32 i_cabac_level)
+   DEBUG_PRINT_LOW("\n venc_set_entropy_config: CABAC = %u level: %u", enable, i_cabac_level);
+ 
+   if(enable &&(codec_profile.profile != VEN_PROFILE_H264_BASELINE)){
+-    entropy_cfg.longentropysel = VEN_ENTROPY_MODEL_CABAC;
++    entropy_cfg.entropysel = VEN_ENTROPY_MODEL_CABAC;
+       if (i_cabac_level == 0) {
+          entropy_cfg.cabacmodel = VEN_CABAC_MODEL_0;
+       }
+@@ -2192,7 +2192,7 @@ bool venc_dev::venc_set_entropy_config(OMX_BOOL enable, OMX_U32 i_cabac_level)
+ #endif
+   }
+   else if(!enable){
+-    entropy_cfg.longentropysel = VEN_ENTROPY_MODEL_CAVLC;
++    entropy_cfg.entropysel = VEN_ENTROPY_MODEL_CAVLC;
+     }
+   else{
+     DEBUG_PRINT_ERROR("\nInvalid Entropy mode for Baseline Profile");
+@@ -2206,7 +2206,7 @@ bool venc_dev::venc_set_entropy_config(OMX_BOOL enable, OMX_U32 i_cabac_level)
+     DEBUG_PRINT_ERROR("\nERROR: Request for setting entropy config failed");
+     return false;
+   }
+-  entropy.longentropysel = entropy_cfg.longentropysel;
++  entropy.entropysel = entropy_cfg.entropysel;
+   entropy.cabacmodel  = entropy_cfg.cabacmodel;
+   return true;
+ }

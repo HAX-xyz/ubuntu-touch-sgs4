@@ -1,0 +1,12 @@
+diff --git a/core/main.mk b/core/main.mk
+index 0098cca..fbd4da9 100644
+--- a/core/main.mk
++++ b/core/main.mk
+@@ -547,6 +547,7 @@ subdirs += \
+ 	vendor/nxp \
+ 	vendor/qcom \
+ 	vendor/samsung \
++	device/samsung/qcom-common/libhealthd \
+ 	vendor/widevine
+ 
+ # Specific projects for Ubuntu Touch

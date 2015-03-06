@@ -1,0 +1,15 @@
+diff --git a/include/media/AudioRecord.h b/include/media/AudioRecord.h
+index 052064d..4973c93 100644
+--- a/include/media/AudioRecord.h
++++ b/include/media/AudioRecord.h
+@@ -35,6 +35,10 @@ class AudioRecord : public RefBase
+ {
+ public:
+ 
++	// Hacky fix for error when compiling Ubuntu Touch
++	// ~localhorse
++	static const int DEFAULT_SAMPLE_RATE = 8000;
++
+     /* Events used by AudioRecord callback function (callback_t).
+      * Keep in sync with frameworks/base/media/java/android/media/AudioRecord.java NATIVE_EVENT_*.
+      */

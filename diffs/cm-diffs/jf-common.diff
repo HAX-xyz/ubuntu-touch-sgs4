@@ -1,0 +1,76 @@
+diff --git a/sepolicy/file.te b/sepolicy/file.te
+index 5b140b3..7db8840 100644
+--- a/sepolicy/file.te
++++ b/sepolicy/file.te
+@@ -16,3 +16,5 @@ type persist_bluetooth_file, file_type;
+ type persist_drm_file, file_type;
+ type persist_sensors_file, file_type;
+ type persist_wifi_file, file_type;
++type audio_firmware_file, file_type;
++type audio_data_file, file_type;
+\ No newline at end of file
+diff --git a/sepolicy/kickstart.te b/sepolicy/kickstart.te
+deleted file mode 100644
+index 7e92790..0000000
+--- a/sepolicy/kickstart.te
++++ /dev/null
+@@ -1,41 +0,0 @@
+-# kickstart processes and scripts
+-type kickstart, domain;
+-type kickstart_exec, exec_type, file_type;
+-
+-# kickstart_checker.sh talks to init over the property socket
+-unix_socket_connect(kickstart, property, init)
+-
+-# Start /system/bin/qcks from init
+-init_daemon_domain(kickstart)
+-
+-# Spawn /system/bin/efsks and /system/bin/ks
+-allow kickstart kickstart_exec:file { open execute_no_trans getattr };
+-
+-# Run dd on m9kefs[123] block devices; write to /data/qcks/
+-# Run cat on firmware and m9kefs[123] data; write to /data/qcks/
+-allow kickstart efs_block_device:blk_file rw_file_perms;
+-allow kickstart kickstart_data_file:file create_file_perms;
+-allow kickstart kickstart_data_file:dir rw_dir_perms;
+-allow kickstart radio_efs_file:file r_file_perms;
+-allow kickstart radio_efs_file:dir search;
+-
+-# Let qcks access /dev/mdm node (modem driver)
+-allow kickstart radio_device:chr_file r_file_perms;
+-
+-# Allow /dev/ttyUSB0 access
+-allow kickstart radio_device:chr_file { write };
+-
+-# Allow to run toolbox commands
+-allow kickstart shell_exec:file rx_file_perms;
+-# Toolbox commands for firmware dd
+-allow kickstart system_file:file execute_no_trans;
+-
+-# Access to /dev/block/platform/msm_sdcc.1/by-name/m9kefs2
+-allow kickstart block_device:dir { getattr write search };
+-
+-# Set system property key
+-allow kickstart radio_prop:property_service set;
+-
+-allow kickstart shell_exec:file entrypoint;
+-# ls on /data/qcks/
+-allow kickstart self:capability dac_override;
+\ No newline at end of file
+diff --git a/sepolicy/property.te b/sepolicy/property.te
+deleted file mode 100644
+index 74e15e1..0000000
+--- a/sepolicy/property.te
++++ /dev/null
+@@ -1 +0,0 @@
+-type bluetooth_prop, property_type;
+diff --git a/sepolicy/property_contexts b/sepolicy/property_contexts
+index d47798d..2dfa750 100644
+--- a/sepolicy/property_contexts
++++ b/sepolicy/property_contexts
+@@ -1,3 +1,3 @@
+-persist.service.bdroid.         u:object_r:bluetooth_prop:s0
+-bluetooth.                      u:object_r:bluetooth_prop:s0
++# persist.service.bdroid.         u:object_r:bluetooth_prop:s0
++# bluetooth.                      u:object_r:bluetooth_prop:s0
+ net.rmnet_usb0.                 u:object_r:radio_prop:s0

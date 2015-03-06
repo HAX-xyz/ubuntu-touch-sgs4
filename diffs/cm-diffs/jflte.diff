@@ -1,0 +1,38 @@
+diff --git a/BoardConfig.mk b/BoardConfig.mk
+index fbeb005..3dbed5b 100644
+--- a/BoardConfig.mk
++++ b/BoardConfig.mk
+@@ -24,7 +24,8 @@
+ include device/samsung/jf-common/BoardConfigCommon.mk
+ 
+ # inherit from the proprietary version
+--include vendor/samsung/jflte/BoardConfigVendor.mk
++#   -include vendor/samsung/jflte/BoardConfigVendor.mk
+ 
+ # Assert
+ TARGET_OTA_ASSERT_DEVICE := jflte,jfltexx,i9505,GT-I9505,jgedlte,i9505g,GT-I9505G,jfltevzw,jfltespr,jflterefreshspr,jfltetmo,jfltecri,jfltecsp,jflteatt,jfltecan,jflteusc,jfltezm
++TARGET_KERNEL_CONFIG := cyanogen_jf_defconfig
+diff --git a/cm.mk b/cm.mk
+index bc513e2..12b55d7 100644
+--- a/cm.mk
++++ b/cm.mk
+@@ -1,9 +1,9 @@
+ $(call inherit-product, device/samsung/jflte/full_jflte.mk)
+ 
+ # Enhanced NFC
+-$(call inherit-product, vendor/cm/config/nfc_enhanced.mk)
++# $(call inherit-product, vendor/cm/config/nfc_enhanced.mk)
+ 
+ # Inherit some common CM stuff.
+-$(call inherit-product, vendor/cm/config/common_full_phone.mk)
++# $(call inherit-product, vendor/cm/config/common_full_phone.mk)
+ 
+-PRODUCT_NAME := cm_jflte
++PRODUCT_NAME := full_jflte
+diff --git a/vendorsetup.sh b/vendorsetup.sh
+index 31bab1a..1a1a02b 100755
+--- a/vendorsetup.sh
++++ b/vendorsetup.sh
+@@ -1 +1 @@
+-add_lunch_combo cm_jflte-eng
++add_lunch_combo full_jflte-eng
